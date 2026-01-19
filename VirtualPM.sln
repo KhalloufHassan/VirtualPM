@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualPM", "VirtualPM\VirtualPM.csproj", "{CC416F0D-60AF-454D-84AB-6732EF251C68}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC416F0D-60AF-454D-84AB-6732EF251C68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC416F0D-60AF-454D-84AB-6732EF251C68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC416F0D-60AF-454D-84AB-6732EF251C68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC416F0D-60AF-454D-84AB-6732EF251C68}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
