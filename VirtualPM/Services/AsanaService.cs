@@ -73,15 +73,10 @@ public class AsanaService
             if (task.DueOn.HasValue)
             {
                 DateTime dueDate = task.DueOn.Value;
-                if (dueDate > today)
-                {
+                if (dueDate >= today)
                     metrics.HasFutureDueDateTasks = true;
-                }
-
-                if (dueDate < today)
-                {
+                else
                     metrics.OverdueTaskCount++;
-                }
             }
         }
 
