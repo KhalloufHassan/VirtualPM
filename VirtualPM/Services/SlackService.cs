@@ -55,31 +55,36 @@ public class SlackService
         return historyResponse.Messages.Any(m => m.User == userId);
     }
 
-    public async Task<(string name, string email)> GetUserInfoAsync(string userId)
+    public async Task<SlackUserInfo> GetSlackUserInfo(string userId)
     {
         UserResponse userResponse = await _client.Users.Info(userId);
 
         if (!userResponse.OK)
         {
-            return (string.Empty, string.Empty);
+            return null;
         }
 
         string name = userResponse.User.RealName ?? userResponse.User.Name ?? "Unknown";
         string email = userResponse.User.Profile?.Email ?? string.Empty;
+        bool isBot = userResponse.User.IsBot ?? false;
 
-        return (name, email);
-    }
+        // Check if user is on leave
+        string statusText = userResponse.User.Profile?.StatusText?.ToLower() ?? string.Empty;
+        string statusEmoji = userResponse.User.Profile?.StatusEmoji?.ToLower() ?? string.Empty;
+        string[] leaveIndicators = ["out sick", "sick", "vacationing", "vacation", "ooo", "out of office", "pto", "off"];
+        string[] leaveEmojis = [":palm_tree:", ":face_with_thermometer:", ":airplane:", ":beach:", ":house:", ":sleeping:"];
+        bool hasLeaveText = leaveIndicators.Any(indicator => statusText.Contains(indicator));
+        bool hasLeaveEmoji = leaveEmojis.Any(emoji => statusEmoji.Contains(emoji));
+        bool isOnLeave = hasLeaveText || hasLeaveEmoji;
 
-    public async Task<bool> IsBotUserAsync(string userId)
-    {
-        UserResponse userResponse = await _client.Users.Info(userId);
-
-        if (!userResponse.OK)
+        return new SlackUserInfo
         {
-            return true;
-        }
-
-        return userResponse.User.IsBot ?? false;
+            UserId = userId,
+            Name = name,
+            Email = email,
+            IsBot = isBot,
+            IsOnLeave = isOnLeave
+        };
     }
 
     public async Task SendDailyReportAsync(string claudeMessage, List<UserReport> allUserReports)

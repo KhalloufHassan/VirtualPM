@@ -19,31 +19,38 @@ public class CheckDailyUpdatesJob(
         
         foreach (string member in slackMembers)
         {
-            if (await slackService.IsBotUserAsync(member) || _ignoredMembers.Contains(member))
+            if (_ignoredMembers.Contains(member))
             {
                 continue;
             }
 
+            // Fetch all user info in a single API call
+            SlackUserInfo userInfo = await slackService.GetSlackUserInfo(member);
 
-            (string userName, string userEmail) = await slackService.GetUserInfoAsync(member);
+            // Skip if we couldn't get user info, if user is a bot, or if user is on leave
+            if (userInfo == null || userInfo.IsBot || userInfo.IsOnLeave)
+            {
+                continue;
+            }
+
             bool hasMessages = await slackService.UserHasMessagesTodayAsync(member);
 
             UserReport report = new ()
             {
                 SlackUserId = member,
-                UserName = userName,
-                Email = userEmail,
+                UserName = userInfo.Name,
+                Email = userInfo.Email,
                 PostedToday = hasMessages
             };
 
-            if (!string.IsNullOrEmpty(userEmail))
+            if (!string.IsNullOrEmpty(userInfo.Email))
             {
-                if (asanaUsersByEmail.TryGetValue(userEmail, out AsanaUser asanaUser))
+                if (asanaUsersByEmail.TryGetValue(userInfo.Email, out AsanaUser asanaUser))
                 {
                     UserTaskMetrics metrics = await asanaService.GetUserTaskMetricsAsync(
                         asanaUser.Gid,
-                        userName,
-                        userEmail);
+                        userInfo.Name,
+                        userInfo.Email);
                     report.TaskMetrics = metrics;
                 }
             }
