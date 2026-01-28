@@ -8,8 +8,18 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // Register services
 builder.Services.AddHttpClient(); // Required for AsanaService
 builder.Services.AddScoped<SlackService>();
-builder.Services.AddScoped<ClaudeService>();
 builder.Services.AddScoped<AsanaService>();
+
+// Register message generator based on configuration
+string messageProvider = builder.Configuration.GetValue<string>("VirtualPM:MessageProvider") ?? "File";
+if (messageProvider.Equals("Claude", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddScoped<IMessageGenerator, ClaudeService>();
+}
+else
+{
+    builder.Services.AddSingleton<IMessageGenerator, FileMessageService>();
+}
 
 string cronSchedule = builder.Configuration.GetValue<string>("VirtualPM:CronSchedule") ?? "0 13 * * 0-4";
 

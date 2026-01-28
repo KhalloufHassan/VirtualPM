@@ -5,7 +5,7 @@ namespace VirtualPM.Jobs;
 
 public class CheckDailyUpdatesJob(
     SlackService slackService,
-    ClaudeService claudeService,
+    IMessageGenerator messageGenerator,
     AsanaService asanaService,
     IConfiguration configuration)
 {
@@ -58,12 +58,12 @@ public class CheckDailyUpdatesJob(
             allUserReports.Add(report);
         }
 
-        string claudeMessage = string.Empty;
+        string humorousMessage = string.Empty;
         if (allUserReports.Count(u => !u.PostedToday) > 0)
         {
-            claudeMessage = await claudeService.GenerateHumorousMessageAsync();
+            humorousMessage = await messageGenerator.GenerateHumorousMessageAsync();
         }
 
-        await slackService.SendDailyReportAsync(claudeMessage, allUserReports);
+        await slackService.SendDailyReportAsync(humorousMessage, allUserReports);
     }
 }

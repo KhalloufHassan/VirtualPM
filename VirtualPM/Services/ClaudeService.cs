@@ -4,7 +4,7 @@ using Anthropic.SDK.Messaging;
 
 namespace VirtualPM.Services;
 
-public class ClaudeService
+public class ClaudeService : IMessageGenerator
 {
     private readonly AnthropicClient _client;
 
